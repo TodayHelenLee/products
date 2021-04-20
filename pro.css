@@ -1,0 +1,93 @@
+@import url("//unpkg.com/view-design/dist/styles/iview.css");
+#app {
+  padding: 32px;
+}
+#app {
+  padding: 32px;
+}
+#app {
+  padding: 32px;
+}
+#app {
+  padding: 32px;
+}
+.top {
+  width: 100%;
+  border-bottom: 1px gray solid;
+  margin-bottom: 12px;
+  font-size: 30px;
+}
+.right {
+  width: 50%;
+  height: 70%;
+  display: inline-block;
+}
+.left {
+  width: 40%;
+  height: 70%;
+  display: inline-block;
+}
+h1 {
+  font-size: 50px;
+}
+h3 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 30px;
+  color: midnightblue;
+  -webkit-text-stroke: 0.5px #fff;
+}
+p {
+  z-index: 10;
+}
+.top {
+  width: 100%;
+  border-bottom: 1px gray solid;
+  margin-bottom: 12px;
+  font-size: 30px;
+}
+.outWrap {
+  margin: 0 auto;
+  width: 600px;
+}
+.app {
+  width: 100%;
+  border: 1px solid rgb(216, 214, 214);
+  background-color: rgb(216, 214, 214);
+}
+.inputs {
+  float: right;
+  width: 300px;
+}
+.top {
+  width: 100%;
+  border-bottom: 1px gray solid;
+  margin-bottom: 12px;
+  font-size: 30px;
+}
+.layout {
+  border: 1px solid #d7dde4;
+  background: #f5f7f9;
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+}
+.layout-logo {
+  width: 100px;
+  height: 30px;
+  background: #5b6270;
+  border-radius: 3px;
+  float: left;
+  position: relative;
+  top: 15px;
+  left: 20px;
+}
+.layout-nav {
+  width: 420px;
+  margin: 0 auto;
+  margin-right: 20px;
+}
+.layout-footer-center {
+  text-align: center;
+}
