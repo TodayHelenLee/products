@@ -3,12 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <title>ViewUI example</title>
+
     <link
       rel="stylesheet"
       type="text/css"
       href="https://unpkg.com/view-design/dist/styles/iview.css"
     />
     <link rel="stylesheet" href="./pro.css" />
+    <script src="https://cdn.jsdelivr.net/npm/nanoid/nanoid.js"></script>
     <script
       type="text/javascript"
       src="https://vuejs.org/js/vue.min.js"
@@ -17,6 +19,8 @@
       type="text/javascript"
       src="https://unpkg.com/view-design/dist/iview.min.js"
     ></script>
+    <script src="https://unpkg.com/vuex"></script>
+    <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>
   </head>
   <body>
     <div id="app">
@@ -24,7 +28,6 @@
         <layout>
           <i-header>
             <i-menu mode="horizontal" theme="dark" active-name="1">
-              <div class="layout-logo"></div>
               <div class="layout-nav">
                 <menu-item name="1" @click.native="add1">
                   <icon type="ios-navigate"></icon>
@@ -38,10 +41,42 @@
                   <icon type="ios-analytics"></icon>
                   加入會員
                 </menu-item>
+                <menu-item name="4" @click.native="add4">
+                  <icon type="ios-analytics"></icon>
+                  結帳
+                </menu-item>
               </div>
-            </i-menu>
-          </i-header>
-          <i-content :style="{padding: '0 50px'}">
+            </i-menu></i-header
+          ><i-content :style="{padding: '0 50px'}">
+            <div :class="{fixUp:true,disappear:isAppear}">
+              <!-- <i-input placeholder="Enter something..." style="width: 120px" />
+                  <i-input
+                    type="password"
+                    password
+                    placeholder="Enter something..."
+                    style="width: 190px"
+                  /> -->
+              <div @click="dropOut" class="fixUpTitle">{{login}}</div>
+              帳號:<input v-model.trim="count" type="text" />姓名:<input
+                v-model.trim.number="name"
+                type="text"
+              />
+              <div>
+                <input
+                  id="fixButton"
+                  class="fixButton"
+                  type="reset"
+                  value="清空"
+                  @click="clear"
+                /><input
+                  @click="send"
+                  class="fixButton"
+                  type="button"
+                  value="送出"
+                />
+                <icon type="md-add" @click="remove" class="myAdd" />
+              </div>
+            </div>
             <div v-if="lis[0]">
               <div class="top">最新消息</div>
               <carousel
@@ -162,7 +197,15 @@
                 justify="center"
                 style="background: #eee; padding: 20px"
               >
-                <tools :names="p" v-for="p in filter_a"></tools>
+                <div v-for="(item, index) in filter_a" :key="index">
+                  <div class="bookWrap">
+                    <p style="font-size: 20px">{{item.title}}</p>
+                    <p style="color: red">{{item.dollar}}$</p>
+                    <img width="80%" :src="item.url" alt="" />
+
+                    <i-button type="Primary"> 加入購物車 </i-button>
+                  </div>
+                </div>
               </row>
             </div>
             <div v-if="lis[2]">
@@ -241,6 +284,20 @@
                 </form-item>
               </i-form>
             </div>
+            <div v-if="lis[3]">
+              <div class="top">結帳</div>
+              <div class="left">
+                <div>購物明細</div>
+                <div>
+                  <radio-group v-model="buttonSize" type="button">
+                    <radio label="large">全選</radio>
+                    <radio label="default">刪除</radio>
+                  </radio-group>
+                </div>
+                <div></div>
+                <div></div>
+              </div>
+            </div>
           </i-content>
           <i-footer class="layout-footer-center"
             >2011-2016 &copy; TalkingData</i-footer
@@ -276,6 +333,32 @@
 
       const pageSize = 5;
 
+      // const store = new Vuex.Store({
+      //   state: {
+      //     shopCar: {
+      //       西班牙歷史: [{}],
+      //       魔界: [{}],
+      //       風起雲湧: [{}],
+      //       丹麥女孩: [{}],
+      //       東周列國志: [{}],
+      //     },
+      //   },
+      //   mutations: {
+      //     ADD(state, val) {
+      //       for (let i in state.shopCar) {
+      //         if (i == val.title) {
+      //           state.shopCar[i].splice(0, 1, val);
+      //         }
+      //       }
+      //     },
+      //   },
+      //   actions: {
+      //     adds(context, val) {
+      //       context.commit("ADD", val);
+      //     },
+      //   },
+      // });
+
       new Vue({
         el: "#app",
         mounted() {
@@ -286,14 +369,17 @@
               member: name[i],
             });
           }
-
           function getPageList(p, size) {
             return data.slice((p - 1) * size, p * size);
           }
 
           const pageSize = 5;
           for (var i = 0; i < 5; i++) {
-            this.a.push({ title: this.title[i], dollar: i * 2 });
+            this.a.push({
+              title: this.title[i],
+              url: this.url[i],
+              dollar: i * 2,
+            });
           }
         },
         computed: {
@@ -320,6 +406,16 @@
           },
         },
         data: {
+          buttonSize: "large",
+          login:
+            (localStorage.getItem("user") ? "登出" : "會員登入") || "會員登入",
+          count: "",
+          name: "",
+          isAppear: localStorage.getItem("user")
+            ? true
+            : false || this.local
+            ? true
+            : false,
           value2: 0,
           formValidate: {
             name: "",
@@ -359,6 +455,7 @@
               },
             ],
           },
+          local: localStorage.getItem("user"),
           total: data.length,
           page: 1,
           pageSize: pageSize,
@@ -380,29 +477,78 @@
               key: "member",
             },
           ],
-          lis: [0, 0, 0],
+          lis: localStorage.getItem("lis")
+            ? JSON.parse(localStorage.getItem("lis"))
+            : [0, 0, 0, 0],
           filter: "",
-          title: ["西班牙歷史", "魔界", "氣象站", "丹麥女孩", "東周列國傳"],
+          title: ["西班牙歷史", "魔界", "風起雲湧", "丹麥女孩", "東周列國志"],
+          url: [
+            "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/081/38/0010813873.jpg&w=374&h=374&v=5c5411ac",
+            "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/089/66/0010896687.jpg&w=374&h=374&v=60deeab0",
+            "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/058/61/0010586158.jpg&w=374&h=374&v=518a3753",
+            "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/067/62/0010676232.jpg&w=374&h=374&v=555b2ccd",
+            "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/CN1/171/07/CN11710792.jpg&w=374&h=374&v=5df313d0",
+          ],
+
           a: [],
           b: [1, 2, 3],
         },
-        components: {
-          tools: {
-            template: `<i-col style="margin:20px" span="5" offset="1">
-            <card >
-                <p slot="title" style="font-size:20px">{{names.title}}</p>
-                <p slot="extra" style="color:red">{{names.dollar}}$</p>
-                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTkIvss8MTxPkZGZ3RJV7NYuH6g6r_iCRzjw&usqp=CAU" alt="">
-            </card>
-        </i-col> `,
-            props: ["names"],
-          },
-        },
+        watch: {},
+        // components: {
+        //   tools: {
+        //     template: `<i-col style="margin:20px" span="5" offset="1">
+        //     <card >
+        //         <p slot="title" style="font-size:20px">{{names.title}}</p>
+        //         <p slot="extra" style="color:red">{{names.dollar}}$</p>
+        //         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTkIvss8MTxPkZGZ3RJV7NYuH6g6r_iCRzjw&usqp=CAU" alt="">
+        //     </card>
+        // </i-col> `,
+        //     props: ["names"],
+        //   },
+        // },
         methods: {
+          clear() {
+            this.count = "";
+            this.name = "";
+          },
+          dropOut() {
+            console.log(this.isAppear, "");
+            if (this.isAppear == true) {
+              this.isAppear = false;
+              localStorage.removeItem("name");
+              localStorage.removeItem("user");
+              this.login = "會員登入";
+              window.location.reload();
+            }
+          },
+          send() {
+            if (this.count && this.name) {
+              localStorage.setItem("name", JSON.stringify(this.name));
+              localStorage.setItem("user", JSON.stringify(this.count));
+              this.isAppear = !this.isAppear;
+              this.login = "登出";
+              window.location.reload();
+            }
+          },
+          remove() {
+            this.isAppear = !this.isAppear;
+          },
           handleSubmit(name) {
             this.$refs[name].validate((valid) => {
               if (valid) {
                 this.$Message.success("註冊成功");
+                localStorage.setItem(
+                  "name",
+                  JSON.stringify(this.formValidate.name)
+                );
+                localStorage.setItem(
+                  "user",
+                  JSON.stringify(this.formValidate.mail)
+                );
+                setTimeout(() => {
+                  this.$refs[name].resetFields();
+                }, 2000);
+                window.location.reload();
               } else {
                 this.$Message.error("失敗");
               }
@@ -417,16 +563,36 @@
           },
           add1(e) {
             console.log(1);
-            this.lis.splice(0, 3, 0, 0, 0);
+            this.lis.splice(0, 3, 0, 0, 0, 0);
             this.lis.splice(0, 1, 1);
+            localStorage.setItem("lis", JSON.stringify(this.lis));
           },
           add2(e) {
-            this.lis.splice(0, 3, 0, 0, 0);
+            this.lis.splice(0, 3, 0, 0, 0, 0);
             this.lis.splice(1, 1, 1);
+            localStorage.setItem("lis", JSON.stringify(this.lis));
           },
           add3(e) {
-            this.lis.splice(0, 3, 0, 0, 0);
+            this.lis.splice(0, 3, 0, 0, 0, 0);
             this.lis.splice(2, 1, 1);
+            localStorage.setItem("lis", JSON.stringify(this.lis));
+          },
+
+          add4(e) {
+            // this.local = localStorage.getItem("password");
+
+            console.log(this.local, "");
+            if (!this.local) {
+              this.$Modal.warning({
+                title: "注意",
+                content: "請先登入",
+              });
+            } else {
+              console.log("ppp", "");
+              this.lis.splice(0, 3, 0, 0, 0, 0);
+              this.lis.splice(3, 1, 1);
+              localStorage.setItem("lis", JSON.stringify(this.lis));
+            }
           },
         },
       });
