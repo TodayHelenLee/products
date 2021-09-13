@@ -203,7 +203,9 @@
                     <p style="color: red">{{item.dollar}}$</p>
                     <img width="80%" :src="item.url" alt="" />
 
-                    <i-button type="Primary"> 加入購物車 </i-button>
+                    <i-button @click="adds(item,index)" type="Primary">
+                      加入購物車
+                    </i-button>
                   </div>
                 </div>
               </row>
@@ -286,16 +288,21 @@
             </div>
             <div v-if="lis[3]">
               <div class="top">結帳</div>
+              <button @click="sume" style="width: 200px">結帳</button>
               <div class="left">
                 <div>購物明細</div>
                 <div>
-                  <radio-group v-model="buttonSize" type="button">
-                    <radio label="large">全選</radio>
-                    <radio label="default">刪除</radio>
-                  </radio-group>
+                  <ul>
+                    <li v-for="(item, index) in agane" :key="index">
+                      <input type="checkbox" :checked="item.check" />
+                      <img
+                        :src="item[index].url"
+                        alt=""
+                        srcset=""
+                      />價格:{{item[index].dollar}}
+                    </li>
+                  </ul>
                 </div>
-                <div></div>
-                <div></div>
               </div>
             </div>
           </i-content>
@@ -333,35 +340,31 @@
 
       const pageSize = 5;
 
-      // const store = new Vuex.Store({
-      //   state: {
-      //     shopCar: {
-      //       西班牙歷史: [{}],
-      //       魔界: [{}],
-      //       風起雲湧: [{}],
-      //       丹麥女孩: [{}],
-      //       東周列國志: [{}],
-      //     },
-      //   },
-      //   mutations: {
-      //     ADD(state, val) {
-      //       for (let i in state.shopCar) {
-      //         if (i == val.title) {
-      //           state.shopCar[i].splice(0, 1, val);
-      //         }
-      //       }
-      //     },
-      //   },
-      //   actions: {
-      //     adds(context, val) {
-      //       context.commit("ADD", val);
-      //     },
-      //   },
-      // });
+      const store = new Vuex.Store({
+        state: {
+          shop: [],
+        },
+        mutations: {
+          ADD(state, val) {
+            // state.shop.splice(i, 1, state.shop[i] + val);
+            console.log(val, "a");
+          },
+        },
+        actions: {
+          adds(context, val) {
+            context.commit("ADD", val);
+            console.log(val, "a");
+          },
+        },
+      });
 
       new Vue({
         el: "#app",
+        store,
         mounted() {
+          for (var i = 0; i <= 4; i++) {
+            this.wrap.push([]);
+          }
           for (let i = 0; i < 20; i++) {
             data.push({
               id: i + 1,
@@ -378,11 +381,22 @@
             this.a.push({
               title: this.title[i],
               url: this.url[i],
-              dollar: i * 2,
+              dollar: (i + 1) * 100,
+              check: false,
             });
           }
         },
         computed: {
+          agane() {
+            return this.reWrap.filter((val, i, arr) => {
+              return val[i] != null;
+            });
+          },
+          reWrap() {
+            return this.wrap.filter((value) => {
+              return value != [];
+            });
+          },
           data: [],
           name: [
             "光化出版社",
@@ -406,6 +420,7 @@
           },
         },
         data: {
+          wrap: [],
           buttonSize: "large",
           login:
             (localStorage.getItem("user") ? "登出" : "會員登入") || "會員登入",
@@ -477,6 +492,16 @@
               key: "member",
             },
           ],
+          aa: 0,
+          aaa: 0,
+          bb: 0,
+          bbb: 1,
+          cc: 0,
+          ccc: 2,
+          dd: 0,
+          ddd: 3,
+          ee: 0,
+          eee: 4,
           lis: localStorage.getItem("lis")
             ? JSON.parse(localStorage.getItem("lis"))
             : [0, 0, 0, 0],
@@ -507,6 +532,11 @@
         //   },
         // },
         methods: {
+          adds(item, i, val) {
+            this.wrap[i].splice(i, 1, item);
+            console.log(this.agane, "");
+            this.$store.dispatch("adds", val);
+          },
           clear() {
             this.count = "";
             this.name = "";
@@ -576,6 +606,12 @@
             this.lis.splice(0, 3, 0, 0, 0, 0);
             this.lis.splice(2, 1, 1);
             localStorage.setItem("lis", JSON.stringify(this.lis));
+          },
+          sume() {
+            this.wrap = [];
+            this.$Modal.success({
+              title: "付款成功",
+            });
           },
 
           add4(e) {
