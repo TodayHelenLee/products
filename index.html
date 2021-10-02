@@ -292,15 +292,8 @@
               <div class="left">
                 <div>購物明細</div>
                 <div>
-                  <ul>
-                    <li v-for="(item, index) in agane" :key="index">
-                      <input type="checkbox" :checked="item.check" />
-                      <img
-                        :src="item[index].url"
-                        alt=""
-                        srcset=""
-                      />價格:{{item[index].dollar}}
-                    </li>
+                  <ul v-for="item in countCar" :key="item.id">
+                    <li>{{item}}</li>
                   </ul>
                 </div>
               </div>
