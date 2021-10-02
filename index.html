@@ -49,13 +49,6 @@
             </i-menu></i-header
           ><i-content :style="{padding: '0 50px'}">
             <div :class="{fixUp:true,disappear:isAppear}">
-              <!-- <i-input placeholder="Enter something..." style="width: 120px" />
-                  <i-input
-                    type="password"
-                    password
-                    placeholder="Enter something..."
-                    style="width: 190px"
-                  /> -->
               <div @click="dropOut" class="fixUpTitle">{{login}}</div>
               帳號:<input v-model.trim="count" type="text" />姓名:<input
                 v-model.trim.number="name"
@@ -203,7 +196,9 @@
                     <p style="color: red">{{item.dollar}}$</p>
                     <img width="80%" :src="item.url" alt="" />
 
-                    <i-button type="Primary"> 加入購物車 </i-button>
+                    <i-button type="Primary" @click="addCar(index)">
+                      加入購物車
+                    </i-button>
                   </div>
                 </div>
               </row>
@@ -294,7 +289,7 @@
                     <radio label="default">刪除</radio>
                   </radio-group>
                 </div>
-                <ul v-for="(item, index) in countCar" :key="index">
+                <ul v-for="(item, index) in carBook" :key="index">
                   <li>{{item}}</li>
                 </ul>
               </div>
@@ -334,32 +329,6 @@
 
       const pageSize = 5;
 
-      // const store = new Vuex.Store({
-      //   state: {
-      //     shopCar: {
-      //       西班牙歷史: [{}],
-      //       魔界: [{}],
-      //       風起雲湧: [{}],
-      //       丹麥女孩: [{}],
-      //       東周列國志: [{}],
-      //     },
-      //   },
-      //   mutations: {
-      //     ADD(state, val) {
-      //       for (let i in state.shopCar) {
-      //         if (i == val.title) {
-      //           state.shopCar[i].splice(0, 1, val);
-      //         }
-      //       }
-      //     },
-      //   },
-      //   actions: {
-      //     adds(context, val) {
-      //       context.commit("ADD", val);
-      //     },
-      //   },
-      // });
-
       new Vue({
         el: "#app",
         mounted() {
@@ -380,26 +349,11 @@
               title: this.title[i],
               url: this.url[i],
               dollar: i * 2,
+              click: 0,
             });
           }
         },
         computed: {
-          // data: [],
-          // name: [
-          //   "光化出版社",
-          //   "奇金文化",
-          //   "奇金文化",
-          //   "長頸兔文教機構",
-          //   "奇金文化",
-          //   "銅周刊",
-          //   "奇金文化",
-          //   "銅周刊",
-          //   "奇金文化",
-          //   "大大文化",
-          // ],試試看是否運行
-          countCar() {
-            return this.filter_a;
-          },
           filter_a: function () {
             return this.a.filter((p) => {
               if (p.title.indexOf(this.filter) != -1) {
@@ -410,6 +364,7 @@
           },
         },
         data: {
+          carBook: [],
           buttonSize: "large",
           login:
             (localStorage.getItem("user") ? "登出" : "會員登入") || "會員登入",
@@ -498,19 +453,26 @@
           b: [1, 2, 3],
         },
         watch: {},
-        // components: {
-        //   tools: {
-        //     template: `<i-col style="margin:20px" span="5" offset="1">
-        //     <card >
-        //         <p slot="title" style="font-size:20px">{{names.title}}</p>
-        //         <p slot="extra" style="color:red">{{names.dollar}}$</p>
-        //         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRTkIvss8MTxPkZGZ3RJV7NYuH6g6r_iCRzjw&usqp=CAU" alt="">
-        //     </card>
-        // </i-col> `,
-        //     props: ["names"],
-        //   },
-        // },
         methods: {
+          addCar(index) {
+            var exitist;
+
+            for (let i = 0; i < this.carBook.length; i++) {
+              if (this.filter_a[index].title == this.carBook[i].title) {
+                exitist = true;
+                this.carBook[i].click = this.carBook[i].click + 1;
+              } else {
+                continue;
+              }
+            }
+            if (!exitist) {
+              this.carBook.push(this.filter_a[index]);
+              console.log(this.carBook[0].click, "");
+              this.carBook[this.carBook.length - 1].click = 1;
+            } else {
+              return;
+            }
+          },
           clear() {
             this.count = "";
             this.name = "";
@@ -583,8 +545,6 @@
           },
 
           add4(e) {
-            // this.local = localStorage.getItem("password");
-
             console.log(this.local, "");
             if (!this.local) {
               this.$Modal.warning({
