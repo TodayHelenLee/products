@@ -11,6 +11,12 @@
 #app {
   padding: 32px;
 }
+
+.cards {
+  margin: 20px;
+  width: 300px;
+}
+
 .top {
   width: 100%;
   border-bottom: 1px gray solid;
@@ -22,11 +28,21 @@
   height: 70%;
   display: inline-block;
 }
+
 .left {
-  width: 40%;
+  max-width: 50%;
   height: 70%;
   display: inline-block;
 }
+
+.ivu-checkbox-wrapper {
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-block;
+  margin-right: 8px;
+  transform: translate(10px, -10px);
+}
+
 h1 {
   font-size: 50px;
 }
@@ -166,4 +182,17 @@ p {
 }
 .ivu-list-split .ivu-list-item {
   border-bottom: 0px;
+}
+
+li {
+  list-style-type: none;
+}
+
+.ivu-col-span-11 {
+  max-width: 50%;
+  min-width: 50%;
+}
+
+.ivu-layout-content {
+  padding: 0px 0px;
 }

@@ -194,7 +194,7 @@
                   <div class="bookWrap">
                     <p style="font-size: 20px">{{item.title}}</p>
                     <p style="color: red">{{item.dollar}}$</p>
-                    <img width="80%" :src="item.url" alt="" />
+                    <img width="40%" :src="item.url" alt="" />
 
                     <i-button type="Primary" @click="addCar(index)">
                       加入購物車
@@ -284,14 +284,69 @@
               <div class="left">
                 <div>購物明細</div>
                 <div>
-                  <radio-group v-model="buttonSize" type="button">
-                    <radio label="large">全選</radio>
-                    <radio label="default">刪除</radio>
-                  </radio-group>
+                  <i-button
+                    @click.stop.prevent="selectAll"
+                    type="primary"
+                    style="position: absolute; left: 120px; top: 120px"
+                  >
+                    全選
+                  </i-button>
+                  <i-button
+                    @click.stop.prevent="deleteAll"
+                    type="primary"
+                    style="position: absolute; left: 200px; top: 120px"
+                  >
+                    刪除
+                  </i-button>
                 </div>
                 <ul v-for="(item, index) in carBook" :key="index">
-                  <li>{{item}}</li>
+                  <li class="cards">
+                    <i-col>
+                      <card>
+                        <p slot="title" :style="{height:'100px' }">
+                          <checkbox
+                            v-model="item.checked"
+                            :checked="item.checked"
+                            style="margin-top: -50px"
+                          ></checkbox>
+
+                          <img
+                            :style="{height:'100px' }"
+                            :src="item.url"
+                            alt=""
+                            srcset=""
+                          />
+                        </p>
+                        <p>書名:{{item.title}}</p>
+                        <hr />
+                        <p>單價:{{item.dollar}}</p>
+                        <p>
+                          數量:{{item.click}}
+                          <input
+                            v-model="item.click"
+                            style="margin-left: 20px; width: 100px"
+                            type="number"
+                            min="0"
+                            name=""
+                            id=""
+                          />
+                        </p>
+                        <hr />
+                        <p>總額:{{item.dollar*item.click}}</p>
+                      </card>
+                    </i-col>
+                  </li>
                 </ul>
+                <i-button
+                  @click.stop.prevent="deleteAll"
+                  type="error"
+                  style="position: absolute; left: 280px; top: 120px"
+                >
+                  結帳
+                </i-button>
+                <div id="app">
+                  <row> </row>
+                </div>
               </div>
             </div>
           </i-content>
@@ -323,7 +378,7 @@
         });
       }
 
-      function getPageList(p, size) {
+      function getPagelist(p, size) {
         return data.slice((p - 1) * size, p * size);
       }
 
@@ -339,7 +394,7 @@
               member: name[i],
             });
           }
-          function getPageList(p, size) {
+          function getPagelist(p, size) {
             return data.slice((p - 1) * size, p * size);
           }
 
@@ -348,8 +403,9 @@
             this.a.push({
               title: this.title[i],
               url: this.url[i],
-              dollar: i * 2,
+              dollar: (i + 100) * 2,
               click: 0,
+              checked: false,
             });
           }
         },
@@ -364,7 +420,7 @@
           },
         },
         data: {
-          carBook: [],
+          carBook: JSON.parse(window.localStorage.getItem("carBook")) || [],
           buttonSize: "large",
           login:
             (localStorage.getItem("user") ? "登出" : "會員登入") || "會員登入",
@@ -404,6 +460,7 @@
             phone: [
               { required: true, message: "電話不能空白", trigger: "blur" },
             ],
+            mom: 0,
             date: [],
             desc: [
               {
@@ -418,7 +475,7 @@
           total: data.length,
           page: 1,
           pageSize: pageSize,
-          list: getPageList(1, pageSize),
+          list: getPagelist(1, pageSize),
           columns: [
             {
               title: "",
@@ -452,8 +509,42 @@
           a: [],
           b: [1, 2, 3],
         },
-        watch: {},
+        watch: {
+          carBook: {
+            deep: true,
+            handler(val) {
+              window.localStorage.setItem("carBook", JSON.stringify(val));
+            },
+          },
+        },
         methods: {
+          selectAll() {
+            this.carBook.forEach((value, i, arr) => {
+              arr[i].checked = true;
+            });
+          },
+          deleteAll() {
+            var number = 0;
+            var init;
+            var index;
+            init = this.carBook.find((value) => {
+              return value.checked == true;
+            });
+
+            this.carBook.forEach((value, i, arr) => {
+              if (value.checked == true) {
+                number++;
+              }
+            });
+
+            this.carBook.forEach((value, i, arr) => {
+              if (value == init) {
+                index = i;
+              }
+            });
+
+            this.carBook.splice(index, number);
+          },
           addCar(index) {
             var exitist;
 
@@ -467,7 +558,6 @@
             }
             if (!exitist) {
               this.carBook.push(this.filter_a[index]);
-              console.log(this.carBook[0].click, "");
               this.carBook[this.carBook.length - 1].click = 1;
             } else {
               return;
@@ -478,12 +568,12 @@
             this.name = "";
           },
           dropOut() {
-            console.log(this.isAppear, "");
             if (this.isAppear == true) {
               this.isAppear = false;
               localStorage.removeItem("name");
               localStorage.removeItem("user");
               this.login = "會員登入";
+              this.add1(1);
               window.location.reload();
             }
           },
@@ -525,10 +615,9 @@
           },
           changePage(p) {
             this.page = p;
-            this.list = getPageList(p, pageSize);
+            this.list = getPagelist(p, pageSize);
           },
           add1(e) {
-            console.log(1);
             this.lis.splice(0, 3, 0, 0, 0, 0);
             this.lis.splice(0, 1, 1);
             localStorage.setItem("lis", JSON.stringify(this.lis));
@@ -545,14 +634,12 @@
           },
 
           add4(e) {
-            console.log(this.local, "");
             if (!this.local) {
               this.$Modal.warning({
                 title: "注意",
                 content: "請先登入",
               });
             } else {
-              console.log("ppp", "");
               this.lis.splice(0, 3, 0, 0, 0, 0);
               this.lis.splice(3, 1, 1);
               localStorage.setItem("lis", JSON.stringify(this.lis));
