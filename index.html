@@ -21,6 +21,12 @@
     ></script>
     <script src="https://unpkg.com/vuex"></script>
     <script src="https://unpkg.com/vue-router@2.0.0/dist/vue-router.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.22.0/axios.min.js"
+      integrity="sha512-m2ssMAtdCEYGWXQ8hXVG4Q39uKYtbfaJL5QMTbhl2kc6vYyubrKHhr6aLLXW4ITeXSywQLn1AhsAaqrJl8Acfg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
   </head>
   <body>
     <div id="app">
@@ -42,7 +48,7 @@
                   加入會員
                 </menu-item>
                 <menu-item name="4" @click.native="add4">
-                  <icon type="ios-analytics"></icon>
+                  <icon type="md-card"></icon>
                   結帳
                 </menu-item>
               </div>
@@ -387,6 +393,7 @@
       new Vue({
         el: "#app",
         mounted() {
+          console.log("tag", axios);
           for (let i = 0; i < 20; i++) {
             data.push({
               id: i + 1,
