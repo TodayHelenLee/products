@@ -393,7 +393,7 @@
       new Vue({
         el: "#app",
         mounted() {
-          console.log("tag", axios);
+          //建置布告欄假資料 在畫面掛載後
           for (let i = 0; i < 20; i++) {
             data.push({
               id: i + 1,
@@ -405,6 +405,7 @@
             return data.slice((p - 1) * size, p * size);
           }
 
+          //掛載書本資料
           const pageSize = 5;
           for (var i = 0; i < 5; i++) {
             this.a.push({
@@ -416,7 +417,9 @@
             });
           }
         },
+
         computed: {
+          //有找到關鍵文字
           filter_a: function () {
             return this.a.filter((p) => {
               if (p.title.indexOf(this.filter) != -1) {
@@ -427,12 +430,15 @@
           },
         },
         data: {
+          //倉庫有值先取無值帶空陣列
           carBook: JSON.parse(window.localStorage.getItem("carBook")) || [],
           buttonSize: "large",
+          //倉庫有值先取無值帶空陣列
           login:
             (localStorage.getItem("user") ? "登出" : "會員登入") || "會員登入",
           count: "",
           name: "",
+          //倉庫有值先取無值帶空陣列 判斷是否登入
           isAppear: localStorage.getItem("user")
             ? true
             : false || this.local
@@ -478,11 +484,12 @@
               },
             ],
           },
+          //記憶登入者
           local: localStorage.getItem("user"),
           total: data.length,
           page: 1,
           pageSize: pageSize,
-          list: getPagelist(1, pageSize),
+          list: getPagelist(1, pageSize), //頁籤起始
           columns: [
             {
               title: "",
@@ -500,6 +507,7 @@
               key: "member",
             },
           ],
+          //記憶目前頁面位置
           lis: localStorage.getItem("lis")
             ? JSON.parse(localStorage.getItem("lis"))
             : [0, 0, 0, 0],
@@ -518,63 +526,82 @@
         },
         watch: {
           carBook: {
-            deep: true,
+            deep: true, //深層觀察
             handler(val) {
+              //一旦數值改變則用字串方式存入儲存庫
               window.localStorage.setItem("carBook", JSON.stringify(val));
             },
           },
         },
         methods: {
+          //將所有勾選框勾選
           selectAll() {
             this.carBook.forEach((value, i, arr) => {
               arr[i].checked = true;
             });
           },
+          //將所有勾選的刪除
           deleteAll() {
-            var number = 0;
-            var init;
-            var index;
-            init = this.carBook.find((value) => {
-              return value.checked == true;
-            });
+            // var number = 0;
+            // var init;
+            // var index;
+            var arr;
+            //選出第一個刪除值
+            arr = this.carBook.filter(
+              (value, i, arr) => value.checked == false
+            );
+            console.log(arr);
+            // init = this.carBook.find((value) => {
+            //   return value.checked == true;
+            // });
 
-            this.carBook.forEach((value, i, arr) => {
-              if (value.checked == true) {
-                number++;
-              }
-            });
+            // //算出刪除數量
+            // this.carBook.forEach((value, i, arr) => {
+            //   if (value.checked == true) {
+            //     number++;
+            //   }
+            // });
 
-            this.carBook.forEach((value, i, arr) => {
-              if (value == init) {
-                index = i;
-              }
-            });
+            // //選出第一個刪除索引
+            // this.carBook.forEach((value, i, arr) => {
+            //   if (value == init) {
+            //     index = i;
+            //   }
+            // });
 
-            this.carBook.splice(index, number);
+            //執行刪除
+            this.carBook = arr;
           },
+          //將書本加入購物車
           addCar(index) {
             var exitist;
 
             for (let i = 0; i < this.carBook.length; i++) {
               if (this.filter_a[index].title == this.carBook[i].title) {
                 exitist = true;
+                //增加書本數量
                 this.carBook[i].click = this.carBook[i].click + 1;
               } else {
+                //繼續過濾
                 continue;
               }
             }
             if (!exitist) {
+              //如果不存在push放入新陣列
               this.carBook.push(this.filter_a[index]);
               this.carBook[this.carBook.length - 1].click = 1;
             } else {
+              //如果存在則離開
               return;
             }
           },
           clear() {
+            //將輸入內容清空
             this.count = "";
             this.name = "";
           },
           dropOut() {
+            //登出
             if (this.isAppear == true) {
               this.isAppear = false;
               localStorage.removeItem("name");
@@ -585,6 +612,7 @@
             }
           },
           send() {
+            //送出登入者內容
             if (this.count && this.name) {
               localStorage.setItem("name", JSON.stringify(this.name));
               localStorage.setItem("user", JSON.stringify(this.count));
@@ -594,9 +622,11 @@
             }
           },
           remove() {
+            //改變樣式升降 判斷登入與否
             this.isAppear = !this.isAppear;
           },
           handleSubmit(name) {
+            //判斷表單是否成功
             this.$refs[name].validate((valid) => {
               if (valid) {
                 this.$Message.success("註冊成功");
@@ -609,6 +639,7 @@
                   JSON.stringify(this.formValidate.mail)
                 );
                 setTimeout(() => {
+                  //重置表單 元件內置
                   this.$refs[name].resetFields();
                 }, 2000);
                 window.location.reload();
@@ -618,15 +649,19 @@
             });
           },
           handleReset(name) {
+            //重置表單 元件內置
             this.$refs[name].resetFields();
           },
           changePage(p) {
+            //改變頁面
+            console.log("tag", p);
             this.page = p;
-            this.list = getPagelist(p, pageSize);
+            this.list = getPagelist(p, pageSize); //頁籤設定
           },
+          //以下皆為改變頁面顯示與否
           add1(e) {
-            this.lis.splice(0, 3, 0, 0, 0, 0);
-            this.lis.splice(0, 1, 1);
+            this.lis.splice(0, 3, 0, 0, 0, 0); //全部刪除
+            this.lis.splice(0, 1, 1); //再添加數值到陣列顯示
             localStorage.setItem("lis", JSON.stringify(this.lis));
           },
           add2(e) {

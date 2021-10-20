@@ -31,8 +31,16 @@
 
 .left {
   max-width: 50%;
-  height: 70%;
-  display: inline-block;
+  /* height: 70%; */
+  display: inline;
+}
+
+@media (max-width: 400px) {
+  .left {
+    width: 50%;
+    /* height: 70%; */
+    display: inline-block;
+  }
 }
 
 .ivu-checkbox-wrapper {
@@ -186,6 +194,10 @@ p {
 
 li {
   list-style-type: none;
+}
+
+.cards {
+  float: left;
 }
 
 .ivu-col-span-11 {
