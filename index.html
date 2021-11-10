@@ -35,15 +35,15 @@
           <i-header>
             <i-menu mode="horizontal" theme="dark" active-name="1">
               <div class="layout-nav">
-                <menu-item name="1" @click.native="add1">
+                <menu-item name="1" @click.native="add1(1)">
                   <icon type="ios-navigate"></icon>
                   最新消息
                 </menu-item>
-                <menu-item name="2" @click.native="add2">
+                <menu-item name="2" @click.native="add2(2)">
                   <icon type="ios-keypad"></icon>
                   產品型錄
                 </menu-item>
-                <menu-item name="3" @click.native="add3">
+                <menu-item name="3" @click.native="add3(3)">
                   <icon type="ios-analytics"></icon>
                   加入會員
                 </menu-item>
@@ -200,8 +200,9 @@
                   <div class="bookWrap">
                     <p style="font-size: 20px">{{item.title}}</p>
                     <p style="color: red">{{item.dollar}}$</p>
-                    <img width="40%" :src="item.url" alt="" />
-
+                    <div width="70%" class="control">
+                      <img width="70%" :src="item.url" alt="" />
+                    </div>
                     <i-button type="Primary" @click="addCar(index)">
                       加入購物車
                     </i-button>
@@ -388,7 +389,7 @@
         return data.slice((p - 1) * size, p * size);
       }
 
-      const pageSize = 5;
+      const pageSize = 9;
 
       new Vue({
         el: "#app",
@@ -406,18 +407,20 @@
           }
 
           //掛載書本資料
-          const pageSize = 5;
-          for (var i = 0; i < 5; i++) {
+          const pageSize = 9;
+          for (var i = 0; i < 9; i++) {
             this.a.push({
               title: this.title[i],
               url: this.url[i],
-              dollar: (i + 100) * 2,
+              dollar: Math.floor(Math.random() * 500) + 100,
               click: 0,
               checked: false,
             });
           }
         },
-
+        updated() {
+          console.log(this.remeber);
+        },
         computed: {
           //有找到關鍵文字
           filter_a: function () {
@@ -430,6 +433,7 @@
           },
         },
         data: {
+          remeber: "",
           //倉庫有值先取無值帶空陣列
           carBook: JSON.parse(window.localStorage.getItem("carBook")) || [],
           buttonSize: "large",
@@ -512,13 +516,27 @@
             ? JSON.parse(localStorage.getItem("lis"))
             : [0, 0, 0, 0],
           filter: "",
-          title: ["西班牙歷史", "魔界", "風起雲湧", "丹麥女孩", "東周列國志"],
+          title: [
+            "西班牙歷史",
+            "魔界",
+            "風起雲湧",
+            "丹麥女孩",
+            "東周列國志",
+            "健康身心",
+            "情緒說服",
+            "真相的凋零",
+            "多益",
+          ],
           url: [
             "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/081/38/0010813873.jpg&w=374&h=374&v=5c5411ac",
             "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/089/66/0010896687.jpg&w=374&h=374&v=60deeab0",
             "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/058/61/0010586158.jpg&w=374&h=374&v=518a3753",
             "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/067/62/0010676232.jpg&w=374&h=374&v=555b2ccd",
             "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/CN1/171/07/CN11710792.jpg&w=374&h=374&v=5df313d0",
+            "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/089/82/0010898234.jpg&v=60f55431&w=280&h=280",
+            "https://im2.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/078/58/0010785843.jpg&v=5b078e8d&w=120&h=120",
+            "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/084/98/0010849832.jpg&v=5e5742fa&w=120&h=120",
+            "https://im1.book.com.tw/image/getImage?i=https://www.books.com.tw/img/001/089/89/0010898932.jpg&v=6103e2ba&w=150&h=150",
           ],
 
           a: [],
@@ -607,8 +625,19 @@
               localStorage.removeItem("name");
               localStorage.removeItem("user");
               this.login = "會員登入";
-              this.add1(1);
-              window.location.reload();
+              if (this.remeber == 1) {
+                this.add1();
+                window.location.reload();
+              } else if (this.remeber == 2) {
+                this.add2();
+                window.location.reload();
+              } else if (this.remeber == 3) {
+                this.add3();
+                window.location.reload();
+              } else {
+                this.add3();
+                window.location.reload();
+              }
             }
           },
           send() {
@@ -663,16 +692,19 @@
             this.lis.splice(0, 3, 0, 0, 0, 0); //全部刪除
             this.lis.splice(0, 1, 1); //再添加數值到陣列顯示
             localStorage.setItem("lis", JSON.stringify(this.lis));
+            this.remeber = e;
           },
           add2(e) {
             this.lis.splice(0, 3, 0, 0, 0, 0);
             this.lis.splice(1, 1, 1);
             localStorage.setItem("lis", JSON.stringify(this.lis));
+            this.remeber = e;
           },
           add3(e) {
             this.lis.splice(0, 3, 0, 0, 0, 0);
             this.lis.splice(2, 1, 1);
             localStorage.setItem("lis", JSON.stringify(this.lis));
+            this.remeber = e;
           },
 
           add4(e) {
